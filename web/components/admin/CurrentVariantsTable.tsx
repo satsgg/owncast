@@ -50,6 +50,7 @@ export const CurrentVariantsTable: FC = () => {
   const { serverConfig, setFieldInConfigState } = serverStatusData || {};
   const { videoSettings } = serverConfig || {};
   const { videoQualityVariants } = videoSettings || {};
+  console.debug('videoQualityVariants', videoQualityVariants);
 
   let resetTimer = null;
 
@@ -154,6 +155,12 @@ export const CurrentVariantsTable: FC = () => {
         variant.videoPassthrough
           ? 'n/a'
           : ENCODER_PRESET_TOOLTIPS[level]?.split(' ')[0] || 'Warning: please edit & reset',
+    },
+    {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+      render: (price: number) => `${price} millisats/s`,
     },
     {
       title: '',

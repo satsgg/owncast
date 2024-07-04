@@ -45,6 +45,9 @@ func Start(enableVerboseLogging bool) error {
 
 	// Return HLS video
 	r.HandleFunc("/hls/*", controllers.HandleHLSRequest)
+	
+	// Return bolt11 invoice status
+	r.HandleFunc("/.well-known/bolt11", controllers.CheckPaymentStatus)
 
 	// The admin web app.
 	r.HandleFunc("/admin/*", middleware.RequireAdminAuth(controllers.IndexHandler))
@@ -141,4 +144,5 @@ func addStaticFileEndpoints(r chi.Router) {
 
 	// Instance details
 	r.HandleFunc("/api/v1/instance", apControllers.InstanceV1Controller)
+
 }

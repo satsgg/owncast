@@ -374,7 +374,8 @@ func (v *HLSVariant) getVideoQualityString(t *Transcoder) string {
 	if v.isVideoPassthrough {
 		return fmt.Sprintf("-map v:0 -c:v:%d copy", v.index)
 	}
-
+	fmt.Println("-maxrate", v.getMaxVideoBitrate())
+	fmt.Println("-b:v", v.getAllocatedVideoBitrate())
 	gop := v.framerate * t.currentLatencyLevel.SecondsPerSegment // force an i-frame every segment
 	cmd := []string{
 		"-map v:0",

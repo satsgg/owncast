@@ -13,6 +13,8 @@ import {
   ENCODER_PRESET_TOOLTIPS,
   VIDEO_BITRATE_DEFAULTS,
   VIDEO_BITRATE_SLIDER_MARKS,
+  VIDEO_PRICE_DEFAULTS,
+  VIDEO_PRICE_SLIDER_MARKS,
   FRAMERATE_SLIDER_MARKS,
   FRAMERATE_DEFAULTS,
   FRAMERATE_TOOLTIPS,
@@ -46,6 +48,10 @@ export const VideoVariantForm: FC<VideoVariantFormProps> = ({
   };
   const handleVideoCpuUsageLevelChange = (value: number) => {
     onUpdateField({ fieldName: 'cpuUsageLevel', value });
+  };
+  const handlePriceChange = (value: number) => {
+    console.debug(`price changed: ${value}`);
+    onUpdateField({ fieldName: 'price', value });
   };
   const handleScaledWidthChanged = (args: UpdateArgs) => {
     const value = Number(args.value);
@@ -95,6 +101,14 @@ export const VideoVariantForm: FC<VideoVariantFormProps> = ({
     }
     return note;
   };
+  const selectedPricePPMNote = () => {
+    // videoPassthroughEnabled?
+    return `${Math.ceil((dataState.price * 60) / 1000)} sats per minute.`;
+  };
+  const selectedPricePPHNote = () => {
+    // videoPassthroughEnabled?
+    return `${Math.ceil((dataState.price * 60 * 60) / 1000)} sats per hour`;
+  };
   const selectedFramerateNote = () => {
     if (videoPassthroughEnabled) {
       return 'Framerate selection is disabled when Video Passthrough is enabled.';
@@ -141,14 +155,6 @@ export const VideoVariantForm: FC<VideoVariantFormProps> = ({
       )}
 
       <Row gutter={16}>
-        <Col xs={24} lg={{ span: 24, pull: 3 }} className="video-text-field-container">
-          <TextField
-            maxLength="10"
-            {...VIDEO_NAME_DEFAULTS}
-            value={dataState.name}
-            onChange={handleNameChanged}
-          />
-        </Col>
         <Col sm={24} md={12}>
           <div className="form-module cpu-usage-container">
             <Typography.Title level={3}>CPU or GPU Utilization</Typography.Title>
@@ -212,6 +218,40 @@ export const VideoVariantForm: FC<VideoVariantFormProps> = ({
                 rel="noopener noreferrer"
               >
                 Read more about bitrates.
+              </a>
+            </p>
+          </div>
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
+        <Col sm={24} md={11}>
+          {/* PRICE FIELD */}
+          <div
+            className={`form-module bitrate-container ${
+              dataState.videoPassthrough ? 'disabled' : ''
+            }`}
+          >
+            <Typography.Title level={3}>Price</Typography.Title>
+            <p className="description">{VIDEO_PRICE_DEFAULTS.tip}</p>
+            <div className="segment-slider-container">
+              <Slider
+                tipFormatter={value => `${value} ${VIDEO_PRICE_DEFAULTS.unit}`}
+                disabled={dataState.videoPassthrough}
+                defaultValue={dataState.price}
+                value={dataState.price}
+                onChange={handlePriceChange}
+                step={VIDEO_PRICE_DEFAULTS.incrementBy}
+                min={VIDEO_PRICE_DEFAULTS.min}
+                max={VIDEO_PRICE_DEFAULTS.max}
+                marks={VIDEO_PRICE_SLIDER_MARKS}
+              />
+              <p className="selected-value-note">{selectedPricePPMNote()}</p>
+              <p className="selected-value-note">{selectedPricePPHNote()}</p>
+            </div>
+            <p className="read-more-subtext">
+              <a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener noreferrer">
+                Read more about bitcoin.
               </a>
             </p>
           </div>

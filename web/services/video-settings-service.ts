@@ -9,6 +9,7 @@ export type VideoQuality = {
    * @example '1.2Mbps@24fps'
    */
   name: string;
+  price: number;
 };
 
 export interface VideoSettingsStaticService {
@@ -16,6 +17,7 @@ export interface VideoSettingsStaticService {
 }
 
 class VideoSettingsService {
+  // TODO: Add price to response
   private static readonly VIDEO_CONFIG_URL = '/api/video/variants';
 
   public static async getVideoQualities(): Promise<Array<VideoQuality>> {

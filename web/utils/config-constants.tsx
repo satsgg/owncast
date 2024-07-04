@@ -249,6 +249,7 @@ export const DEFAULT_VARIANT_STATE: VideoVariant = {
   cpuUsageLevel: 2,
   scaledHeight: null,
   scaledWidth: null,
+  price: 0,
   name: '',
 };
 
@@ -469,6 +470,32 @@ export const VIDEO_BITRATE_SLIDER_MARKS = {
       marginLeft: '-10px',
     },
     label: `${VIDEO_BITRATE_DEFAULTS.max} ${VIDEO_BITRATE_DEFAULTS.unit}`,
+  },
+};
+// VIDEO_PRICE_DEFAULTS,
+// VIDEO_PRICE_SLIDER_MARKS,
+// VIDEO VARIANT FORM - price
+export const VIDEO_PRICE_DEFAULTS = {
+  min: 0,
+  max: 5000,
+  defaultValue: 0,
+  unit: 'ms/s',
+  incrementBy: 10,
+  tip: 'Price in millisats per second',
+};
+
+export const VIDEO_PRICE_SLIDER_MARKS = {
+  [VIDEO_PRICE_DEFAULTS.min]: {
+    style: {
+      marginLeft: '24px',
+    },
+    label: `${VIDEO_PRICE_DEFAULTS.min} ${VIDEO_PRICE_DEFAULTS.unit}`,
+  },
+  [VIDEO_PRICE_DEFAULTS.max]: {
+    style: {
+      marginLeft: '-10px',
+    },
+    label: `${VIDEO_PRICE_DEFAULTS.max} ${VIDEO_PRICE_DEFAULTS.unit}`,
   },
 };
 // VIDEO VARIANT FORM - encoder preset

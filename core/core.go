@@ -11,6 +11,7 @@ import (
 	"github.com/owncast/owncast/config"
 	"github.com/owncast/owncast/core/chat"
 	"github.com/owncast/owncast/core/data"
+	"github.com/owncast/owncast/core/lnd"
 	"github.com/owncast/owncast/core/rtmp"
 	"github.com/owncast/owncast/core/transcoder"
 	"github.com/owncast/owncast/core/user"
@@ -83,6 +84,17 @@ func Start() error {
 	webhooks.SetupWebhooks(GetStatus)
 
 	notifications.Setup(data.GetStore())
+
+	// should probably just run lnd.Start()
+	// go func? Why shouldn't I need that?
+	// store client?
+	// client := lnd.Start()
+	lnd.Start() // singleton
+	// if client == nil {
+	// 	log.Warn("Failed to start lnd connection")
+	// 	// set some flag that says we aren't connected..
+	// 	// Call Start function and reset flag when creds are updated on admin GUI
+	// }
 
 	return nil
 }

@@ -51,3 +51,17 @@ export const isMobileSafariHomeScreenApp = () => {
 
   return 'standalone' in window.navigator && window.navigator.standalone;
 };
+
+export function base64ToHex(base64) {
+  // Decode base64 to binary string
+  const binaryString = atob(base64);
+
+  // Convert binary string to hex
+  let hex = '';
+  for (let i = 0; i < binaryString.length; i++) {
+    const hexChar = binaryString.charCodeAt(i).toString(16);
+    hex += hexChar.padStart(2, '0'); // Ensure each hex value is two digits
+  }
+
+  return hex;
+}

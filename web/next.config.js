@@ -13,14 +13,18 @@ const withPWA = require('next-pwa')({
       handler: 'NetworkOnly',
     },
     {
-      urlPattern: (url) => { return url.pathname.startsWith("/admin/"); },
+      urlPattern: url => {
+        return url.pathname.startsWith('/admin/');
+      },
       handler: 'NetworkOnly',
       options: {
-        fetchOptions: { credentials: 'same-origin' }
-      }
+        fetchOptions: { credentials: 'same-origin' },
+      },
     },
     {
-      urlPattern: (url) => { return url.pathname.startsWith("/api/"); },
+      urlPattern: url => {
+        return url.pathname.startsWith('/api/');
+      },
       handler: 'NetworkOnly',
     },
     ...runtimeCaching,
@@ -43,6 +47,10 @@ async function rewrites() {
     {
       source: '/hls/:path*',
       destination: 'http://localhost:8080/hls/:path*', // Proxy to Backend to work around CORS.
+    },
+    {
+      source: '/.well-known/bolt11',
+      destination: 'http://localhost:8080/.well-known/bolt11',
     },
     {
       source: '/img/:path*',
@@ -77,7 +85,17 @@ module.exports = async phase => {
           unoptimized: true,
         },
         swcMinify: true,
-        transpilePackages: [ "antd", "@ant-design", "rc-util", "rc-pagination", "rc-picker", "rc-notification", "rc-tooltip", "rc-tree", "rc-table" ],
+        transpilePackages: [
+          'antd',
+          '@ant-design',
+          'rc-util',
+          'rc-pagination',
+          'rc-picker',
+          'rc-notification',
+          'rc-tooltip',
+          'rc-tree',
+          'rc-table',
+        ],
         webpack(config) {
           config.module.rules.push({
             test: /\.svg$/i,

@@ -65,6 +65,8 @@ export interface VideoVariant {
   scaledWidth: number;
   scaledHeight: number;
 
+  price: number; // sats per second
+
   name: string;
 }
 export interface VideoSettingsFields {

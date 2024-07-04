@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect } from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useHotkeys } from 'react-hotkeys-hook';
 import classNames from 'classnames';
@@ -12,8 +12,13 @@ import PlaybackMetrics from '../metrics/playback';
 import { createVideoSettingsMenuButton } from '../settings-menu';
 import LatencyCompensator from '../latencyCompensator';
 import styles from './OwncastPlayer.module.scss';
-import { VideoSettingsServiceContext } from '../../../services/video-settings-service';
+import {
+  VideoQuality,
+  VideoSettingsServiceContext,
+} from '../../../services/video-settings-service';
 import { ComponentError } from '../../ui/ComponentError/ComponentError';
+import { L402 } from '../L402/L402';
+import { Lsat } from 'lsat-js';
 
 const PLAYER_VOLUME = 'owncast_volume';
 const LATENCY_COMPENSATION_ENABLED = 'latencyCompensatorEnabled';
@@ -42,6 +47,9 @@ export const OwncastPlayer: FC<OwncastPlayerProps> = ({
   const playerRef = React.useRef(null);
   const [videoPlaying, setVideoPlaying] = useRecoilState<boolean>(isVideoPlayingAtom);
   const clockSkew = useRecoilValue<Number>(clockSkewAtom);
+  const [videoQualities, setVideoQualities] = useState<VideoQuality[]>([]);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [l402, setL402] = useState<Lsat | null>(null);
 
   const setSavedVolume = () => {
     try {
@@ -130,6 +138,7 @@ export const OwncastPlayer: FC<OwncastPlayerProps> = ({
 
   const createSettings = async (player, videojs) => {
     const videoQualities = await VideoSettingsService.getVideoQualities();
+    setVideoQualities(videoQualities);
     const menuButton = createVideoSettingsMenuButton(
       player,
       videojs,
@@ -143,6 +152,9 @@ export const OwncastPlayer: FC<OwncastPlayerProps> = ({
       player.controlBar.children_.length - 2,
     );
     setupLatencyCompensator(player);
+
+    // Decide whether to show overlay or not
+    // show qualities and allow user to select duration
   };
 
   const setupAirplay = (player, videojs) => {
@@ -225,7 +237,9 @@ export const OwncastPlayer: FC<OwncastPlayerProps> = ({
     },
     sources: [
       {
-        src: source,
+        // src: source,
+        src: `${source}${l402 ? '?l402=' + l402.toToken() : ''}`,
+        // src: `${source}?hi=yeet`,
         type: 'application/x-mpegURL',
       },
     ],
@@ -272,6 +286,11 @@ export const OwncastPlayer: FC<OwncastPlayerProps> = ({
     playbackMetrics.setClockSkew(clockSkew);
 
     createSettings(player, videojs);
+    // videojs.Hls.xhr.beforeRequest();
+    // videojs.Hls.xhr.beforeRequest = (options) = {
+    //     options.uri = `${options.uri}?chad=test`
+    //     return options
+    // }
   };
 
   useEffect(() => {
@@ -288,6 +307,33 @@ export const OwncastPlayer: FC<OwncastPlayerProps> = ({
     [],
   );
 
+  useEffect(() => {
+    if (!l402) {
+      // check if payment is required?
+      // expired l402s should open up payment modal even if free lower quality available?
+      // first load need to check if all qualities are payment required
+      // then need to handle payment received
+      // then need to handle l402 expiring, quality changes
+      console.debug('TODO?');
+      setShowPaymentModal(true);
+      return;
+    }
+    setShowPaymentModal(false);
+    if (playerRef.current) {
+      console.debug('l402', l402);
+      console.debug('l402.toToken()', l402.toToken());
+      // playerRef.current.src({
+      //   src: `${source}?l402=${l402.toToken()}`,
+      //   type: 'application/x-mpegURL',
+      // });
+      // playerRef.current.Hls.xhr.beforeRequest = options => {
+      //   options.uri = `${options.uri}?chad=test`;
+      //   return options;
+      // };
+      // playerRef.current.load();
+    }
+  }, [l402]);
+
   return (
     <ErrorBoundary
       // eslint-disable-next-line react/no-unstable-nested-components
@@ -300,9 +346,19 @@ export const OwncastPlayer: FC<OwncastPlayerProps> = ({
       )}
     >
       <div className={classNames(styles.container, className)} id="player">
+        {showPaymentModal && (
+          <div className={styles.l402}>
+            <L402 setL402={setL402} videoQualities={videoQualities} />
+          </div>
+        )}
         {online && (
           <div className={styles.player}>
-            <VideoJS options={videoJsOptions} onReady={handlePlayerReady} aria-label={title} />
+            <VideoJS
+              options={videoJsOptions}
+              onReady={handlePlayerReady}
+              l402={l402}
+              aria-label={title}
+            />
           </div>
         )}
         <div className={styles.poster}>

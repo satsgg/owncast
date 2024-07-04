@@ -3,15 +3,17 @@ import videojs from 'video.js';
 import type VideoJsPlayer from 'video.js/dist/types/player';
 
 import styles from './VideoJS.module.scss';
+import { Lsat } from 'lsat-js';
 
 require('video.js/dist/video-js.css');
 
 export type VideoJSProps = {
   options: any;
   onReady: (player: VideoJsPlayer, vjsInstance: typeof videojs) => void;
+  l402: Lsat | null;
 };
 
-export const VideoJS: FC<VideoJSProps> = ({ options, onReady }) => {
+export const VideoJS: FC<VideoJSProps> = ({ options, onReady, l402 }) => {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const playerRef = React.useRef<VideoJsPlayer | null>(null);
 
@@ -43,10 +45,14 @@ export const VideoJS: FC<VideoJSProps> = ({ options, onReady }) => {
           o.uri = `${o.uri}?cachebust=${cachebuster}`;
         }
 
+        if (o.uri.match('ts') && l402) {
+          o.uri = `${o.uri}?l402=${encodeURIComponent(l402.toToken())}`;
+        }
+
         return o;
       };
     }
-  }, [options, videoRef]);
+  }, [options, videoRef, l402]);
 
   return (
     <div data-vjs-player>
