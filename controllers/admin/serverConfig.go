@@ -32,6 +32,7 @@ func GetServerConfig(w http.ResponseWriter, r *http.Request) {
 			ScaledWidth:        variant.ScaledWidth,
 			ScaledHeight:       variant.ScaledHeight,
 			Price:              variant.Price,
+			Bandwidth:          variant.Bandwidth,
 		})
 	}
 	response := serverConfigAdminResponse{

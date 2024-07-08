@@ -116,14 +116,12 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				rawCaveat = []byte(fmt.Sprintf("max_bitrate=%d", variants[index].VideoBitrate))
+				// TODO: max_bandwidth to be consistent with m3u8?
+				rawCaveat = []byte(fmt.Sprintf("max_bitrate=%d", variants[index].Bandwidth))
 				if err := mac.AddFirstPartyCaveat(rawCaveat); err != nil {
 					fmt.Println("Error adding max bitrate caveat", err)
 					return
 				}
-
-				fmt.Println("Requested max bitrate", variants[index].VideoBitrate)
-				println("Requested variant", variants[index].Name)
 
 				macBytes, err := mac.MarshalBinary()
 				if err != nil {
@@ -230,7 +228,7 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 			// println("caveat", rawCaveat)
 		}
 
-		err = l402.VerifyCaveats(caveats, variants[index].VideoBitrate)
+		err = l402.VerifyCaveats(caveats, variants[index].Bandwidth)
 		if err != nil {
 			fmt.Println("Failed to verify caveats", err)
 			w.WriteHeader(http.StatusPaymentRequired)

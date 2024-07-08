@@ -29,7 +29,11 @@ type StreamOutputVariant struct {
 	// CPUUsageLevel represents a codec preset to configure CPU usage.
 	CPUUsageLevel int `json:"cpuUsageLevel"`
 
+	// Bitcoin price in millisatoshis per second
 	Price int `json:"price"`
+
+	// Final bandwidth as calculated by ffmpeg in bps
+	Bandwidth int `json:"bandwidth"`
 }
 
 // GetFramerate returns the framerate or default.

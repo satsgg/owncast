@@ -13,12 +13,14 @@ type variantsSort struct {
 	VideoBitrate       int
 	IsVideoPassthrough bool
 	Price              int
+	Bandwidth          int
 }
 
 type variantsResponse struct {
 	Name  string `json:"name"`
 	Index int    `json:"index"`
 	Price int    `json:"price"`
+	Bandwidth int `json:"bandwidth"`
 }
 
 // GetVideoStreamOutputVariants will return the video variants available.
@@ -33,6 +35,7 @@ func GetVideoStreamOutputVariants(w http.ResponseWriter, r *http.Request) {
 			IsVideoPassthrough: variant.IsVideoPassthrough,
 			VideoBitrate:       variant.VideoBitrate,
 			Price:	            variant.Price,
+			Bandwidth:           variant.Bandwidth,
 		}
 		streamSortVariants[i] = variantSort
 	}
@@ -55,6 +58,7 @@ func GetVideoStreamOutputVariants(w http.ResponseWriter, r *http.Request) {
 			Index: variant.Index,
 			Name:  variant.Name,
 			Price: variant.Price,
+			Bandwidth: variant.Bandwidth,
 		}
 		response[i] = variantResponse
 	}

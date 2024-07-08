@@ -43,13 +43,19 @@ func (s *LocalStorage) VariantPlaylistWritten(localFilePath string) {
 
 // MasterPlaylistWritten is called when the master hls playlist is written.
 func (s *LocalStorage) MasterPlaylistWritten(localFilePath string) {
-	// If we're using a remote serving endpoint, we need to rewrite the master playlist
-	if true {
-		log.Infoln(*s) // where to get price
-		if err := insertPriceTags(localFilePath); err != nil {
-			log.Warnln(err)
-		}
+
+	log.Infoln(*s)
+	// Insert price value into master playlist
+	if err := insertPriceTags(localFilePath); err != nil {
+		log.Warnln(err)
 	}
+
+	// Add ffmpeg calculated variant bandwidths to stream output variants
+	if err := WriteVariantBandwidths(localFilePath); err != nil {
+		log.Warnln(err)
+	}
+
+	// If we're using a remote serving endpoint, we need to rewrite the master playlist
 	if s.host != "" {
 		if err := rewritePlaylistLocations(localFilePath, s.host, ""); err != nil {
 			log.Warnln(err)

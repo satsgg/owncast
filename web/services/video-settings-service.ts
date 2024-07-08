@@ -10,6 +10,7 @@ export type VideoQuality = {
    */
   name: string;
   price: number;
+  bandwidth: number;
 };
 
 export interface VideoSettingsStaticService {

@@ -138,6 +138,7 @@ export const OwncastPlayer: FC<OwncastPlayerProps> = ({
 
   const createSettings = async (player, videojs) => {
     const videoQualities = await VideoSettingsService.getVideoQualities();
+    console.debug('videoQualities', videoQualities);
     setVideoQualities(videoQualities);
     const menuButton = createVideoSettingsMenuButton(
       player,

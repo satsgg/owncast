@@ -34,7 +34,8 @@ export const L402 = ({
   videoQualities: VideoQuality[];
 }) => {
   const L402Service = useContext(L402ServiceContext);
-  const [selectedQualityIndex, setSelectedQualityIndex] = useState<number | null>(null);
+  // const [selectedQualityIndex, setSelectedQualityIndex] = useState<number | null>(null);
+  const [selectedQuality, setSelectedQuality] = useState<VideoQuality | null>(null);
   const [modal, setModal] = useState<'quality' | 'duration' | 'payment' | 'none'>('quality');
   const [minutes, setMinutes] = useState<number>(1);
   const [price, setPrice] = useState<number>(0);
@@ -59,8 +60,10 @@ export const L402 = ({
   }, [l402Challenge]);
 
   const requestInvoice = async () => {
-    if (!selectedQualityIndex) return;
-    const l402Challenge = await L402Service.fetchInvoice(selectedQualityIndex, minutes * 60);
+    // if (!selectedQualityIndex) return;
+    if (!selectedQuality) return;
+    // const l402Challenge = await L402Service.fetchInvoice(selectedQualityIndex, minutes * 60);
+    const l402Challenge = await L402Service.fetchInvoice(selectedQuality.index, minutes * 60);
     if (!l402Challenge) {
       console.error('handle l402Challenge error in ui');
       return;
@@ -79,8 +82,10 @@ export const L402 = ({
               {videoQualities &&
                 videoQualities.map((q, p) => (
                   <Button
+                    key={p}
                     onClick={() => {
-                      setSelectedQualityIndex(p);
+                      // setSelectedQualityIndex(p);
+                      setSelectedQuality(q);
                       setPrice(60 * q.price);
                       setModal('duration');
                     }}
@@ -94,11 +99,8 @@ export const L402 = ({
             <div className={styles.l402Container}>
               <h1>Select Duration</h1>
               <p>
-                Cost:{' '}
-                {videoQualities[selectedQualityIndex]
-                  ? Math.ceil(videoQualities[selectedQualityIndex].price / 1000)
-                  : 0}{' '}
-                sats per second
+                Cost: {selectedQuality ? Math.ceil(selectedQuality.price / 1000) : 0} sats per
+                second
               </p>
               <div className="segment-slider-container">
                 <Slider
@@ -107,10 +109,11 @@ export const L402 = ({
                   defaultValue={1}
                   value={minutes}
                   onChange={value => {
-                    if (!selectedQualityIndex) return;
+                    if (!selectedQuality) return;
                     setMinutes(value);
                     console.debug('value in minutes', value);
-                    setPrice(value * 60 * videoQualities[selectedQualityIndex].price);
+                    // setPrice(value * 60 * videoQualities[selectedQualityIndex].price);
+                    setPrice(value * 60 * selectedQuality.price);
                   }}
                   step={1}
                   min={1}

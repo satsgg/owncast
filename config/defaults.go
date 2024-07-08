@@ -91,6 +91,7 @@ func GetDefaults() Defaults {
 				Framerate:          24,
 				CPUUsageLevel:      2,
 				Price:              0,
+				Bandwidth:          1531156,
 			},
 		},
 
