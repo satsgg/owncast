@@ -37,7 +37,7 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 	requestedPath := r.URL.Path
 	relativePath := strings.Replace(requestedPath, "/hls/", "", 1)
 	fullPath := filepath.Join(config.HLSStoragePath, relativePath)
-
+	middleware.EnableCors(w)
 	// If using external storage then only allow requests for the
 	// master playlist at stream.m3u8, no variants or segments.
 	if data.GetS3Config().Enabled && relativePath != "stream.m3u8" {
@@ -131,7 +131,7 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 
 				str := fmt.Sprintf("macaroon=\"%s\", invoice=\"%s\"",
 				base64.StdEncoding.EncodeToString(macBytes), invoice.PaymentRequest)
-
+				w.Header().Set("Access-Control-Expose-Headers", "WWW-Authenticate")
         w.Header().Set("WWW-Authenticate", "L402 " + str)
         w.WriteHeader(http.StatusPaymentRequired)
 				return
@@ -139,6 +139,28 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		// .ts segment files
+
+		// get the variant and check its price
+		dir := path.Dir(fullPath)	
+		indexStr := path.Base(dir)
+
+		index, err := strconv.Atoi(indexStr)
+		if err != nil {
+			return 
+		}
+
+		variants := data.GetStreamOutputVariants()
+		if index < 0 || index >= len(variants) {
+			return 
+		}
+		variantPrice := variants[index].Price
+		if variantPrice == 0 {
+			cacheTime := utils.GetCacheDurationSecondsForPath(relativePath)
+			w.Header().Set("Cache-Control", "public, max-age="+strconv.Itoa(cacheTime))
+			http.ServeFile(w, r, fullPath)
+			return
+		}
+
 		queryParams := r.URL.Query()
 		l402Params, l402Exists := queryParams["l402"]
 		// TODO: check variant to see if it has price > 0
@@ -176,7 +198,7 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// verify preimage hasehs to the payment hash in the macaroon's identifier
+		// verify preimage hashes to the payment hash in the macaroon's identifier
 		preimage, err := lntypes.MakePreimageFromStr(preimageHexStr)
 		if err != nil {
 			fmt.Println("failed to decode preimage")
@@ -198,20 +220,6 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("failed to verify signature")
 			return
-		}
-
-		// get the variant and its bitrate
-		dir := path.Dir(fullPath)	
-		indexStr := path.Base(dir)
-
-		index, err := strconv.Atoi(indexStr)
-		if err != nil {
-			return 
-		}
-
-		variants := data.GetStreamOutputVariants()
-		if index < 0 || index >= len(variants) {
-			return 
 		}
 
 		// With the L402 verified, we'll now inspect its caveats to ensure the
@@ -237,7 +245,6 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 
 		cacheTime := utils.GetCacheDurationSecondsForPath(relativePath)
 		w.Header().Set("Cache-Control", "public, max-age="+strconv.Itoa(cacheTime))
-
 	}
 
 	middleware.EnableCors(w)

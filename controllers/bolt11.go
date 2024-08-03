@@ -8,6 +8,7 @@ import (
 
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/owncast/owncast/core/lnd"
+	"github.com/owncast/owncast/router/middleware"
 )
 
 type bolt11Response struct {
@@ -19,6 +20,7 @@ func CheckPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	r.URL.Query()
 	queryParams := r.URL.Query()
 	hash, hashExists := queryParams["h"]
+	middleware.EnableCors(w)
 
 	if !hashExists {
 		BadRequestHandler(w, errors.New("missing payment hash"))
@@ -36,7 +38,6 @@ func CheckPaymentStatus(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-
 	if invoice.State == lnrpc.Invoice_SETTLED {
 		WriteResponse(w, bolt11Response{
 			Status: invoice.State.String(),
