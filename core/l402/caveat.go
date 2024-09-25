@@ -34,17 +34,17 @@ func DecodeCaveat(s string) (Caveat, error) {
 }
 
 func VerifyCaveats(caveats []Caveat, bitrate int) error {
-	// make sure valid_until and max_bitrate exist and are valid
+	// make sure expiration and max_bandwidth exist and are valid
 	validUntilFound := false
 	maxBitrateFound := false
 	for _, caveat := range caveats {
 		if validUntilFound && maxBitrateFound {
 			break
 		}
-		if caveat.Condition == "valid_until" {
+		if caveat.Condition == "expiration" {
 			validUntil, err := strconv.ParseInt(caveat.Value, 10, 64)
 			if err != nil {
-				return errors.New("failed to parse valid_until caveat")
+				return errors.New("failed to parse expiration caveat")
 			}
 			if time.Now().Unix() > validUntil {
 				return errors.New("l402 has expired")
@@ -52,15 +52,15 @@ func VerifyCaveats(caveats []Caveat, bitrate int) error {
 				validUntilFound = true
 			}
 		}
-		if caveat.Condition == "max_bitrate" {
-			maxBitrate, err := strconv.ParseInt(caveat.Value, 10, 64)
+		if caveat.Condition == "max_bandwidth" {
+			maxBandwidth, err := strconv.ParseInt(caveat.Value, 10, 64)
 			if err != nil {
-				return errors.New("failed to parse max_bitrate caveat")
+				return errors.New("failed to parse max_bandwidth caveat")
 			}
 			fmt.Println("bitrate", bitrate)
-			fmt.Println("Max bitrate", maxBitrate)
-			if int64(bitrate) > maxBitrate {
-				return errors.New("bitrate paid for exceeds requested bitrate")
+			fmt.Println("Max bandwidth", maxBandwidth)
+			if int64(bitrate) > maxBandwidth {
+				return errors.New("bandwidth paid for exceeds requested bandwidth")
 			} else {
 				maxBitrateFound = true
 			}

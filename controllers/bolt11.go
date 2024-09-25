@@ -19,7 +19,7 @@ type bolt11Response struct {
 func CheckPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	r.URL.Query()
 	queryParams := r.URL.Query()
-	hash, hashExists := queryParams["h"]
+	hash, hashExists := queryParams["hash"]
 	middleware.EnableCors(w)
 
 	if !hashExists {

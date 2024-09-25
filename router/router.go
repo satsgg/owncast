@@ -47,7 +47,7 @@ func Start(enableVerboseLogging bool) error {
 	r.HandleFunc("/hls/*", controllers.HandleHLSRequest)
 	
 	// Return bolt11 invoice status
-	r.HandleFunc("/.well-known/bolt11", controllers.CheckPaymentStatus)
+	r.HandleFunc("/.well-known/l402/invoice", controllers.CheckPaymentStatus)
 
 	// The admin web app.
 	r.HandleFunc("/admin/*", middleware.RequireAdminAuth(controllers.IndexHandler))

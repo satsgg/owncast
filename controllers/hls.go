@@ -62,7 +62,7 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 		// if it's a variant playlist and the request contains a duration query param,
 		// create and return a macaroon
 		if fullPath != "data/hls/stream.m3u8" {
-			d, dExists := queryParams["t"]
+			d, dExists := queryParams["d"]
 			if dExists && len(d) != 0 {
 				// d, err := strconv.Atoi(d[0])
 				duration, err := strconv.ParseInt(d[0], 10, 64)
@@ -109,17 +109,16 @@ func HandleHLSRequest(w http.ResponseWriter, r *http.Request) {
 				}
 
 				expiration := time.Now().Unix() + duration
-				fmt.Printf("valid_until=%d", expiration)
-				rawCaveat := []byte(fmt.Sprintf("valid_until=%d", expiration))
+				fmt.Printf("expiration=%d", expiration)
+				rawCaveat := []byte(fmt.Sprintf("expiration=%d", expiration))
 				if err := mac.AddFirstPartyCaveat(rawCaveat); err != nil {
 					fmt.Println("Error adding expires caveat", err)
 					return
 				}
 
-				// TODO: max_bandwidth to be consistent with m3u8?
-				rawCaveat = []byte(fmt.Sprintf("max_bitrate=%d", variants[index].Bandwidth))
+				rawCaveat = []byte(fmt.Sprintf("max_bandwidth=%d", variants[index].Bandwidth))
 				if err := mac.AddFirstPartyCaveat(rawCaveat); err != nil {
-					fmt.Println("Error adding max bitrate caveat", err)
+					fmt.Println("Error adding max bandwidth caveat", err)
 					return
 				}
 

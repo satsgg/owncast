@@ -11,8 +11,8 @@ var clientErr error
 func Start() {
 	// tlsPath := "/Users/chad/.polar/networks/2/volumes/lnd/alice/tls.cert"
 	// macDir := "/Users/chad/.polar/networks/2/volumes/lnd/alice/data/chain/bitcoin/regtest/"
-	tlsPath := "/Users/chad/.polar/networks/2/volumes/lnd/bob/tls.cert"
-	macDir := "/Users/chad/.polar/networks/2/volumes/lnd/bob/data/chain/bitcoin/regtest/"
+	tlsPath := "/Users/chad/.polar/networks/5/volumes/lnd/bob/tls.cert"
+	macDir := "/Users/chad/.polar/networks/5/volumes/lnd/bob/data/chain/bitcoin/regtest/"
 
 
 	// hex encoded lnd invoice macaroon
