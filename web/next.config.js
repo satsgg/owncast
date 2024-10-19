@@ -49,8 +49,8 @@ async function rewrites() {
       destination: 'http://localhost:8080/hls/:path*', // Proxy to Backend to work around CORS.
     },
     {
-      source: '/.well-known/bolt11',
-      destination: 'http://localhost:8080/.well-known/bolt11',
+      source: '/.well-known/l402/invoice',
+      destination: 'http://localhost:8080/.well-known/l402/invoice',
     },
     {
       source: '/img/:path*',
